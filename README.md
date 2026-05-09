@@ -1,190 +1,125 @@
-# 🚀 End-to-End Customer Churn Prediction & Retention Decision System
+# Customer Churn Prediction & Retention Decision System
 
-**Built by Nihar Nandala**
+> Most churn projects stop at a prediction. This one ends with a business decision.
 
----
-
-## 🌐 Live Application
-
-👉 https://end-to-end-customer-churn-prediction-retention-decision-system.streamlit.app/
+**Live App → [Open in Streamlit](https://end-to-end-customer-churn-prediction-retention-decision-system.streamlit.app/)**
 
 ---
 
-## 📌 What this project is
+## What this is
 
-Most churn projects stop at prediction.  
-This one doesn’t.
+A production-ready ML system that predicts customer churn **and** tells the business what to do about it.
 
-This system answers:
+Instead of outputting a raw probability:
 
-> “Given this customer, should the business act or not?”
-
-It combines:
-- Machine learning  
-- Decision-making logic  
-- Business context  
-
-To create a practical, deployable system.
-
----
-
-## ⭐ Why this project stands out
-
-- Not just a model → full pipeline + deployment  
-- Not just accuracy → decision + business trade-offs  
-- Not just code → clean product experience  
-
-Built like something usable by a business team.
-
----
-
-## 🧠 Core Idea
-
-Instead of just predicting churn, the system:
-
-1. Predicts churn probability  
-2. Applies a configurable threshold  
-3. Assigns a decision-aware risk level  
-4. Suggests a next step  
-
-So instead of:
-
-```text
-Churn = 0.77
+```
+Churn probability = 0.77
 ```
 
-You get:
+The system outputs a decision:
 
-```text
-High Risk → prioritize for retention review
+```
+High Risk → Prioritise for retention review
+Estimated retention value: $XXX | Campaign cost: $XX | Net impact: $XX
 ```
 
----
-
-## ⚙️ System Overview
-
-### Pipeline
-- Data cleaning & preprocessing  
-- Feature engineering  
-- Model training  
-- Evaluation & reporting  
-- Deployment via Streamlit  
+Built with a modular pipeline, a configurable decision engine, and a live Streamlit app usable by a business team without any technical setup.
 
 ---
 
-### Models Used
+## Why it stands out
 
-| Model               | Role                  |
-|--------------------|-----------------------|
-| Logistic Regression | Final deployed model |
-| XGBoost            | Benchmark comparison |
-
----
-
-### Why Logistic Regression is used in production
-
-Even though XGBoost was tested:
-
-- Logistic Regression performed competitively  
-- More stable predictions  
-- Fully interpretable  
-- Easier to explain in a business setting  
-
-This decision was intentional.
+- **Not just a model** — full pipeline from raw data to deployed app
+- **Not just accuracy** — threshold optimization, business scenario simulation, ROI framing
+- **Not just notebooks** — modular `src/` structure with clean separation of concerns (38 commits)
+- **Intentional design decisions** — documented tradeoffs, not default choices
 
 ---
 
-## 🎯 Decision System (Not Just Prediction)
+## Results
 
-### Threshold-based logic
-- Not fixed at 0.5  
-- Multiple thresholds evaluated  
-- Trade-offs analyzed  
-- Adjustable in the app  
-
----
-
-### Risk segmentation (dynamic)
-
-- Low Risk  
-- Moderate Risk  
-- High Risk  
-
-Risk depends on the selected threshold.
+| Metric | Value |
+|--------|-------|
+| ROC-AUC | ~0.85 |
+| Model | Logistic Regression (production) |
+| Class imbalance | Handled via weighted models |
+| Decision engine | Configurable threshold (not fixed at 0.5) |
 
 ---
 
-## 💼 Business Layer
+## System Design
 
-This system simulates:
+### 1. Prediction layer
+- Logistic Regression selected over XGBoost — intentionally, for interpretability and prediction stability in a business-facing setting
+- XGBoost used as benchmark comparison
+- Class imbalance handled via class weighting
 
-- Who would be targeted in a retention campaign  
-- Cost of targeting  
-- Expected retained value  
-- Net business impact  
+### 2. Decision layer
+- Threshold is configurable in the app — not hardcoded at 0.5
+- Risk segmentation: **Low / Moderate / High** — dynamically assigned based on selected threshold
+- Each prediction maps to a suggested next action
 
-Includes scenario analysis:
-- Pessimistic  
-- Expected  
-- Optimistic  
-
-This makes the model usable for decision-making.
-
----
-
-## 🖥️ Streamlit App
-
-### What you see
-- Customer input form  
-- Real-time churn prediction  
-- Adjustable threshold slider  
-- Risk classification  
-- Suggested next action  
-
-### What you can explore
-- Why the model predicted churn  
-- Feature contributions  
-- Threshold trade-offs  
-- Model comparison (hidden from main UI)
+### 3. Business layer
+- Simulates the impact of running a retention campaign across the customer base
+- **3-scenario analysis**: Pessimistic / Expected / Optimistic
+- Outputs: who gets targeted, campaign cost, expected retained value, net business impact
+- Makes the model output directly usable for budget and strategy decisions
 
 ---
 
-## 📸 Demo
+## Key Design Decisions
+
+| Decision | Reason |
+|----------|--------|
+| Logistic Regression over XGBoost in production | Interpretable, stable, explainable to stakeholders |
+| `Churn Reason` feature excluded | Direct leakage — it reveals the outcome, not a predictor |
+| Threshold not fixed at 0.5 | Business cost of false negatives ≠ false positives; threshold should reflect that |
+| Confidence score removed from UI | Replaced with clearer risk classification logic |
+| Modular `src/` pipeline | Reproducible retraining, clean separation of concerns |
+
+---
+
+## Live App
+
+**[→ Open App](https://end-to-end-customer-churn-prediction-retention-decision-system.streamlit.app/)**
 
 ![App Screenshot](screenshots/Screenshot%20(86).png)
 
----
-
-## 🎥 App Walkthrough
-
 [▶️ Watch Demo Video](App_videos/App%20Recording.webm)
 
+What you can do in the app:
+- Input a customer profile and get a real-time churn prediction
+- Adjust the decision threshold and watch risk classification update live
+- Run the business simulation across Pessimistic / Expected / Optimistic scenarios
+- Explore feature importance to understand what drives churn predictions
+- Compare Logistic Regression vs XGBoost performance
+
 ---
 
-## 📁 Project Structure
+## Project Structure
 
-```text
+```
 telco-churn-decision-system/
-├── app/                  # Streamlit UI
-├── src/                  # Core pipeline
-│   ├── cleaning.py
-│   ├── preprocessing.py
-│   ├── features.py
-│   ├── models.py
-│   ├── evaluation.py
-│   ├── predict.py
-│   └── run_pipeline.py
-├── models/               # Saved model
-├── reports/              # Evaluation outputs
-├── data/                 # Raw dataset
-├── data_processed/       # Cleaned data
+├── app/                    # Streamlit UI
+├── src/
+│   ├── cleaning.py         # Data cleaning
+│   ├── preprocessing.py    # Feature preprocessing
+│   ├── features.py         # Feature engineering
+│   ├── models.py           # Model training & comparison
+│   ├── evaluation.py       # Metrics & reporting
+│   ├── predict.py          # Inference logic
+│   └── run_pipeline.py     # End-to-end pipeline runner
+├── models/                 # Saved model artifacts
+├── reports/                # Evaluation outputs
+├── data/                   # Raw dataset
+├── data_processed/         # Cleaned & processed data
 ├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## ▶️ Running the Project
+## Running Locally
 
 ```bash
 pip install -r requirements.txt
@@ -194,37 +129,13 @@ streamlit run app/streamlit_app.py
 
 ---
 
-## ⚠️ Important Design Decisions
+## Tech Stack
 
-- Churn Reason NOT used → avoids data leakage  
-- Only one model shown in UI → avoids confusion  
-- Confidence removed → replaced with clearer risk logic  
+`Python` · `Scikit-learn` · `XGBoost` · `Pandas` · `NumPy` · `Streamlit` · `Matplotlib` · `Seaborn`
 
 ---
 
-## 📌 What this project demonstrates
-
-- End-to-end ML system design  
-- Clean modular code structure  
-- Model comparison and selection  
-- Threshold-based decision making  
-- Business-aware evaluation  
-- Deployment with usable UI  
-
----
-
-## 🧠 Final Note
-
-This project is not about building the most complex model.
-
-It is about building the right system:
-
-> One that connects predictions to decisions.
-
----
-
-## 👤 Author
+## Author
 
 **Nihar Nandala**
-
-Focused on building practical ML systems that bridge the gap between models and real-world decisions.
+[GitHub](https://github.com/niharnandala) · [LinkedIn](https://linkedin.com/in/niharnandala)
