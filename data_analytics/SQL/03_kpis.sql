@@ -98,4 +98,34 @@ GROUP BY churn_value;
 -- Churn is not concentrated in low value customers
 
 
--- ===========================
+-- ================================================
+
+-- KPI 5: High Risk Active Customer Count
+-- Active customers with churn score above discovered threshold
+-- These are the customers the retention team acts on now
+
+SELECT 
+    COUNT(*) AS high_risk_active_customers
+FROM raw_customers
+WHERE churn_value = 0
+AND churn_score > 60;
+
+-- Result: 1,698 customers need immediate retention attention
+-- Note: All customers with churn_score > 80 have already churned
+-- By the time score reaches 80 it is too late to retain
+-- Early intervention at score 61 is critical
+
+
+-- ================================================
+
+-- KPI 6: Average Tenure of Churned Customers
+-- How long did customers stay before leaving?
+
+SELECT 
+    ROUND(AVG(tenure_months), 1) AS avg_tenure_before_churn
+FROM raw_customers
+WHERE churn_value = 1;
+
+-- Result: 18 months average tenure before churning
+-- Retention intervention should trigger around month 12-15
+-- Before the average churn window opens
