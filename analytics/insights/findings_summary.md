@@ -119,14 +119,17 @@ Ranked by monthly revenue at risk. Based on active customers only.
 
 ---
 
-## Data Notes
+## A Few Things Worth Knowing About This Analysis
 
-- Churn score threshold of 60 was derived from data — scores below 60 show 0% historical churn, scores above 60 show 32%+ churn.
-- Revenue at risk uses monthly charges of active customers, not total charges. Total charges reflects historical revenue already collected. Monthly charges reflects the recurring revenue hole going forward.
-- 20% recovery estimate is based on industry standard telecom retention campaign success rates (15-25%).
-- All customers with churn score above 80 have already churned. By the time score reaches 80 it is too late. Early intervention at score 61 is critical.
-- churn_reason is NULL for non-churned customers. This is expected — NULL means did not churn, not missing data.
+The at-risk threshold of churn score 60 was not assumed — the data showed zero churn below that score and 32%+ churn above it. The threshold came from the numbers, not a guess.
 
+Revenue at risk uses each customer's monthly charge, not their total historical spend. Total charges is money the company already collected. Monthly charges is what stops coming in every month after a customer leaves. That is the number that matters for business decisions.
+
+The 20% recovery estimate is conservative. Telecom retention campaigns typically recover between 15% and 25% of targeted customers. 20% was chosen to avoid overpromising.
+
+Customers with very high churn scores have already churned — none remain active. This means waiting too long to intervene makes retention impossible. The window to act is early, around month 6 to 12, not when the score peaks.
+
+Empty churn reason entries belong to customers who are still with the company. They have no reason to report because they have not left. This is expected and correct.
 ---
 
 ## SQL Files Reference

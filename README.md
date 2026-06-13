@@ -1,98 +1,121 @@
-# Customer Churn Prediction & Retention Decision System
+# $49,302 — A Telco Churn Analysis That Ends With a Number
 
-> Most churn projects stop at a prediction. This one ends with a business decision.
+`SQL` · `PostgreSQL` · `Power BI` · `DAX` · `Python` · `Scikit-learn` · `Streamlit` · `SHAP`
 
 **Live App → [Open in Streamlit](https://end-to-end-customer-churn-prediction-retention-decision-system.streamlit.app/)**
 
 ---
 
-## What this is
+Most churn projects answer one question — will this customer leave — and stop there. That answer alone does not help a business team. They need to know who to call, why those people are leaving, and how much revenue they are protecting by acting on it.
 
-A production-ready ML system that predicts customer churn **and** tells the business what to do about it.
-
-Instead of outputting a raw probability:
-
-```
-Churn probability = 0.77
-```
-
-The system outputs a decision:
-
-```
-High Risk → Prioritise for retention review
-Estimated retention value: $XXX | Campaign cost: $XX | Net impact: $XX
-```
-
-Built with a modular pipeline, a configurable decision engine, and a live Streamlit app usable by a business team without any technical setup.
+So this project has two layers. A machine learning system that predicts churn. And a business intelligence layer built in SQL and Power BI that turns those predictions into decisions — the way an analyst at a telecom company would actually do it.
 
 ---
 
-## Why it stands out
+## ML Prediction App
 
-- **Not just a model** — full pipeline from raw data to deployed app
-- **Not just accuracy** — threshold optimization, business scenario simulation, ROI framing
-- **Not just notebooks** — modular `src/` structure with clean separation of concerns (38 commits)
-- **Intentional design decisions** — documented tradeoffs, not default choices
+![Streamlit App — Customer Profile](screenshots/Screenshot(88).png)
 
----
-
-## Results
-
-| Metric | Value |
-|--------|-------|
-| ROC-AUC | ~0.85 |
-| Model | Logistic Regression (production) |
-| Class imbalance | Handled via weighted models |
-| Decision engine | Configurable threshold (not fixed at 0.5) |
+![Streamlit App — Prediction Output and SHAP](screenshots/Screenshot(87).png)
 
 ---
 
-## System Design
+## Power BI Dashboard
 
-### 1. Prediction layer
-- Logistic Regression selected over XGBoost — intentionally, for interpretability and prediction stability in a business-facing setting
-- XGBoost used as benchmark comparison
-- Class imbalance handled via class weighting
+### Page 1 — Executive Dashboard
 
-### 2. Decision layer
-- Threshold is configurable in the app — not hardcoded at 0.5
-- Risk segmentation: **Low / Moderate / High** — dynamically assigned based on selected threshold
-- Each prediction maps to a suggested next action
+![Executive Dashboard](screenshots/powerbi_panel_1.png)
 
-### 3. Business layer
-- Simulates the impact of running a retention campaign across the customer base
-- **3-scenario analysis**: Pessimistic / Expected / Optimistic
-- Outputs: who gets targeted, campaign cost, expected retained value, net business impact
-- Makes the model output directly usable for budget and strategy decisions
+Six KPI cards. Churn rate, average CLTV of churned customers, average tenure at churn, high risk customer count, monthly revenue at risk, monthly revenue lost. Two bar charts comparing churn rate and revenue lost side by side by contract type. A tenure line chart with a danger window marker showing where churn peaks. One key finding line at the bottom for any stakeholder with 30 seconds.
 
----
+### Page 2 — Segment Deep Dive
 
-## Key Design Decisions
+![Segment Deep Dive](screenshots/powerbi_panel_2.png)
 
-| Decision | Reason |
-|----------|--------|
-| Logistic Regression over XGBoost in production | Interpretable, stable, explainable to stakeholders |
-| `Churn Reason` feature excluded | Direct leakage — it reveals the outcome, not a predictor |
-| Threshold not fixed at 0.5 | Business cost of false negatives ≠ false positives; threshold should reflect that |
-| Confidence score removed from UI | Replaced with clearer risk classification logic |
-| Modular `src/` pipeline | Reproducible retraining, clean separation of concerns |
+Churn rate by internet service. Revenue lost by churn reason ordered by revenue impact. Churn rate by number of services subscribed showing product stickiness. A contract × internet service heatmap where Month-to-month Fiber optic lights up red at 54.61% — the highest risk intersection in the entire dataset. Internet service slicer at the top makes every visual interactive.
+
+### Page 3 — Retention Action Board
+
+![Retention Action Board](screenshots/powerbi_panel_3.png)
+
+High risk active customers ranked by monthly revenue at risk. Month-to-month Fiber optic sits at the top with 333 customers and $29,445 at risk. Total row confirms 1,698 customers and $104,070 in monthly revenue that can still be protected. This is the page the retention team opens Monday morning.
+
+**The original Power BI dashboard file (`churn_dashboard.pbit`) is included under `analytics/powerbi/` for review.**
+
 
 ---
 
-## Live App
+## What this demonstrates
 
-**[→ Open App](https://end-to-end-customer-churn-prediction-retention-decision-system.streamlit.app/)**
+- Full ML pipeline from raw data to deployed prediction app
+- Data cleaning independently in both Python (ML pipeline) and SQL (analytics layer)
+- Leakage prevention — churn_reason, churn_score, and CLTV excluded from the model with documented reasoning
+- Model comparison with threshold optimization — not fixed at 0.5
+- Explainability using SHAP to connect model output to business decisions
+- SQL analytics in PostgreSQL — window functions, CTEs, cohort analysis, revenue segmentation
+- Business dashboarding in Power BI with DAX measures and live PostgreSQL connection
+- Written business recommendations with actual revenue numbers attached
 
-![App Screenshot](screenshots/Screenshot%20(86).png)
+---
 
-[▶️ Watch Demo Video](App_videos/App%20Recording.webm)
+## ML System
 
-What you can do in the app:
-- Input a customer profile and get a real-time churn prediction
-- Adjust the decision threshold and watch risk classification update live
-- Run the business simulation across Pessimistic / Expected / Optimistic scenarios
-- Explore feature importance to understand what drives churn predictions
-- Compare Logistic Regression vs XGBoost performance
+### Model comparison
+
+Both Logistic Regression and XGBoost were built and evaluated.
+
+| Metric | Logistic Regression | XGBoost |
+|---|---|---|
+| ROC-AUC | 0.85 | 0.86 |
+| Recall (churn class) | 0.72 | 0.42 |
+| Precision (churn class) | 0.56 | 0.74 |
+| Accuracy | 0.78 | 0.81 |
+| F1 Score | 0.63 | 0.53 |
+
+XGBoost has higher accuracy and precision. Logistic Regression has significantly higher recall — it catches more churners. In a retention context missing a churner costs more than a false alarm. A customer incorrectly flagged wastes one outreach call. A churner missed walks out the door. Logistic Regression was chosen for the final app because of this recall advantage and because its predictions are explainable to a business team.
+
+### Threshold optimization
+
+The decision threshold is configurable in the app — not fixed at 0.5. The cost of missing a churner is not the same as the cost of a false alarm. At threshold 0.3 recall reaches 0.91. At threshold 0.6 precision reaches 0.56. The right threshold depends on the business goal, not the textbook default.
+
+| Threshold | Precision | Recall | Customers Flagged |
+|---|---|---|---|
+| 0.3 | 0.44 | 0.91 | 782 |
+| 0.4 | 0.48 | 0.87 | 681 |
+| 0.5 | 0.52 | 0.80 | 574 |
+| 0.6 | 0.56 | 0.72 | 480 |
+
+### Why certain columns were excluded from the model
+
+**churn_reason** — exists only after a customer has already churned. Using it would be direct data leakage. It is used in the SQL analytics layer instead, where it belongs.
+
+**churn_score** — generated by an external churn model. Using it means the model learns from another model's output, not from genuine customer behavior.
+
+**CLTV** — calculated using churn-related assumptions. Including it contaminates the feature space.
+
+These exclusions are deliberate, not oversights.
+
+---
+
+## Analytics Layer — What the SQL found
+
+Nine SQL files against a PostgreSQL database. Every finding is attached to a revenue number.
+
+**The churn rate is 26.5% against a telecom industry benchmark of under 10%.** That gap is $139,130 in recurring monthly revenue gone every single month.
+
+**Month-to-month customers are 48% of the customer base but responsible for 87% of revenue lost.** The gap between their customer share and their revenue loss share is where the retention budget needs to go.
+
+**46% of all revenue loss comes from customers in their first 10 months.** Churn drops consistently after month 30. The retention effort needs to be front-loaded into year one.
+
+**Month-to-month + Fiber optic + tenure under 10 months = 71% churn rate.** 238 active customers sit in this combination right now. Of those, 204 have no online security add-on and represent $16,266 in recoverable monthly revenue. One $10 per month add-on reduces their churn risk from 65% to 8%.
+
+**$73,704 every month was lost to internal failures** — bad support attitudes, network reliability issues, pricing gaps. That is 48% more than competitor-driven losses. The data says fix your own house before worrying about the competition.
+
+At a conservative 20% retention success rate across five priority segments, the recoverable monthly revenue is **$49,302.**
+
+### Why PostgreSQL and not SQLite
+
+PostgreSQL supports direct Power BI integration via live connection, handles concurrent access, and has stronger query optimization for analytical workloads. SQLite is a single-file embedded database — suitable for development, not for a BI tool connection or multi-user access.
 
 ---
 
@@ -100,26 +123,43 @@ What you can do in the app:
 
 ```
 telco-churn-decision-system/
-├── app/                    # Streamlit UI
+├── app/                         # Streamlit UI
 ├── src/
-│   ├── cleaning.py         # Data cleaning
-│   ├── preprocessing.py    # Feature preprocessing
-│   ├── features.py         # Feature engineering
-│   ├── models.py           # Model training & comparison
-│   ├── evaluation.py       # Metrics & reporting
-│   ├── predict.py          # Inference logic
-│   └── run_pipeline.py     # End-to-end pipeline runner
-├── models/                 # Saved model artifacts
-├── reports/                # Evaluation outputs
-├── data/                   # Raw dataset
-├── data_processed/         # Cleaned & processed data
+│   ├── cleaning.py
+│   ├── preprocessing.py
+│   ├── features.py
+│   ├── models.py
+│   ├── evaluation.py
+│   ├── predict.py
+│   └── run_pipeline.py
+├── analytics/
+│   ├── sql/
+│   │   ├── 01_setup.sql
+│   │   ├── 02_cleaning.sql
+│   │   ├── 03_kpis.sql
+│   │   ├── 04_contract.sql
+│   │   ├── 05_tenure.sql
+│   │   ├── 06_services.sql
+│   │   ├── 07_intersection.sql
+│   │   ├── 08_churn_reason.sql
+│   │   └── 09_retention_roi.sql
+│   ├── powerbi/
+│   │   └── churn_dashboard.pbix
+│   └── insights/
+│       ├── findings_summary.md
+│       └── retention_brief.md
+├── screenshots/
+├── models/
+├── reports/
+├── data/
+├── data_processed/
 ├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## Running Locally
+## Running locally
 
 ```bash
 pip install -r requirements.txt
@@ -127,15 +167,19 @@ python -m src.run_pipeline
 streamlit run app/streamlit_app.py
 ```
 
----
-
-## Tech Stack
-
-`Python` · `Scikit-learn` · `XGBoost` · `Pandas` · `NumPy` · `Streamlit` · `Matplotlib` · `Seaborn`
+For the analytics layer — run the `.sql` files in order against a PostgreSQL database loaded with the Telco dataset. Open `churn_dashboard.pbix` in Power BI Desktop connected to the same database.
 
 ---
 
-## Author
+## Tech stack
+
+**ML system:** Python · Scikit-learn · XGBoost · Pandas · Streamlit · SHAP
+
+**Analytics layer:** PostgreSQL · SQL · Power BI · DAX
+
+---
+
+If you want to walk through the findings or the reasoning behind any decision in this project, I can explain every number.
 
 **Nihar Nandala**
 [GitHub](https://github.com/niharnandala) · [LinkedIn](https://linkedin.com/in/niharnandala)
