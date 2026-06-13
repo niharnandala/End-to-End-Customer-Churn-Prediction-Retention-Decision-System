@@ -1,4 +1,4 @@
-# $49,302 — A Telco Churn Analysis That Ends With a Number
+# $49,302: A Telco Churn Analysis That Ends With a Number
 
 `SQL` · `PostgreSQL` · `Power BI` · `DAX` · `Python` · `Scikit-learn` · `Streamlit` · `SHAP`
 
@@ -6,17 +6,18 @@
 
 ---
 
-Most churn projects answer one question — will this customer leave — and stop there. That answer alone does not help a business team. They need to know who to call, why those people are leaving, and how much revenue they are protecting by acting on it.
+Most churn projects answer one question, will this customer leave, and stop there. That answer alone does not help a business team. They need to know who to call, why those people are leaving, and how much revenue they are protecting by acting on it.
 
-So this project has two layers. A machine learning system that predicts churn. And a business intelligence layer built in SQL and Power BI that turns those predictions into decisions — the way an analyst at a telecom company would actually do it.
+So this project has two layers. A machine learning system that predicts churn. And a business intelligence layer built in SQL and Power BI that turns those predictions into decisions, the way an analyst at a telecom company would actually do it.
 
 ---
 
 ## ML Prediction App
 
-![Streamlit App — Customer Profile](screenshots/Screenshot(88).png)
-
-![Streamlit App — Prediction Output and SHAP](screenshots/Screenshot(87).png)
+<p align="center">
+  <img src="screenshots/Screenshot(88).png" width="45%" />
+  <img src="screenshots/Screenshot(87).png" width="45%" />
+</p>
 
 ---
 
@@ -24,24 +25,29 @@ So this project has two layers. A machine learning system that predicts churn. A
 
 ### Page 1 — Executive Dashboard
 
-![Executive Dashboard](screenshots/powerbi_panel_1.png)
+<p align="center">
+  <img src="screenshots/powerbi_panel_1.png" width="85%" />
+</p>
 
 Six KPI cards. Churn rate, average CLTV of churned customers, average tenure at churn, high risk customer count, monthly revenue at risk, monthly revenue lost. Two bar charts comparing churn rate and revenue lost side by side by contract type. A tenure line chart with a danger window marker showing where churn peaks. One key finding line at the bottom for any stakeholder with 30 seconds.
 
 ### Page 2 — Segment Deep Dive
 
-![Segment Deep Dive](screenshots/powerbi_panel_2.png)
+<p align="center">
+  <img src="screenshots/powerbi_panel_2.png" width="85%" />
+</p>
 
-Churn rate by internet service. Revenue lost by churn reason ordered by revenue impact. Churn rate by number of services subscribed showing product stickiness. A contract × internet service heatmap where Month-to-month Fiber optic lights up red at 54.61% — the highest risk intersection in the entire dataset. Internet service slicer at the top makes every visual interactive.
+Churn rate by internet service. Revenue lost by churn reason ordered by revenue impact. Churn rate by number of services subscribed showing product stickiness. A contract × internet service heatmap where Month-to-month Fiber optic lights up red at 54.61%, the highest risk intersection in the entire dataset. Internet service slicer at the top makes every visual interactive.
 
 ### Page 3 — Retention Action Board
 
-![Retention Action Board](screenshots/powerbi_panel_3.png)
+<p align="center">
+  <img src="screenshots/powerbi_panel_3.png" width="85%" />
+</p>
 
 High risk active customers ranked by monthly revenue at risk. Month-to-month Fiber optic sits at the top with 333 customers and $29,445 at risk. Total row confirms 1,698 customers and $104,070 in monthly revenue that can still be protected. This is the page the retention team opens Monday morning.
 
-**The original Power BI dashboard file (`churn_dashboard.pbit`) is included under `analytics/powerbi/` for review.**
-
+**The original Power BI dashboard file (`churn_dashboard.pbix`) is included under `analytics/powerbi/` for review.**
 
 ---
 
@@ -49,10 +55,10 @@ High risk active customers ranked by monthly revenue at risk. Month-to-month Fib
 
 - Full ML pipeline from raw data to deployed prediction app
 - Data cleaning independently in both Python (ML pipeline) and SQL (analytics layer)
-- Leakage prevention — churn_reason, churn_score, and CLTV excluded from the model with documented reasoning
-- Model comparison with threshold optimization — not fixed at 0.5
+- Leakage prevention: churn_reason, churn_score, and CLTV excluded from the model with documented reasoning
+- Model comparison with threshold optimization, not fixed at 0.5
 - Explainability using SHAP to connect model output to business decisions
-- SQL analytics in PostgreSQL — window functions, CTEs, cohort analysis, revenue segmentation
+- SQL analytics in PostgreSQL: window functions, CTEs, cohort analysis, revenue segmentation
 - Business dashboarding in Power BI with DAX measures and live PostgreSQL connection
 - Written business recommendations with actual revenue numbers attached
 
@@ -72,11 +78,11 @@ Both Logistic Regression and XGBoost were built and evaluated.
 | Accuracy | 0.78 | 0.81 |
 | F1 Score | 0.63 | 0.53 |
 
-XGBoost has higher accuracy and precision. Logistic Regression has significantly higher recall — it catches more churners. In a retention context missing a churner costs more than a false alarm. A customer incorrectly flagged wastes one outreach call. A churner missed walks out the door. Logistic Regression was chosen for the final app because of this recall advantage and because its predictions are explainable to a business team.
+XGBoost has higher accuracy and precision. Logistic Regression has significantly higher recall, it catches more churners. In a retention context missing a churner costs more than a false alarm. A customer incorrectly flagged wastes one outreach call. A churner missed walks out the door. Logistic Regression was chosen for the final app because of this recall advantage and because its predictions are explainable to a business team.
 
 ### Threshold optimization
 
-The decision threshold is configurable in the app — not fixed at 0.5. The cost of missing a churner is not the same as the cost of a false alarm. At threshold 0.3 recall reaches 0.91. At threshold 0.6 precision reaches 0.56. The right threshold depends on the business goal, not the textbook default.
+The decision threshold is configurable in the app, not fixed at 0.5. The cost of missing a churner is not the same as the cost of a false alarm. At threshold 0.3 recall reaches 0.91. At threshold 0.6 precision reaches 0.56. The right threshold depends on the business goal, not the textbook default.
 
 | Threshold | Precision | Recall | Customers Flagged |
 |---|---|---|---|
@@ -87,17 +93,17 @@ The decision threshold is configurable in the app — not fixed at 0.5. The cost
 
 ### Why certain columns were excluded from the model
 
-**churn_reason** — exists only after a customer has already churned. Using it would be direct data leakage. It is used in the SQL analytics layer instead, where it belongs.
+**churn_reason**: exists only after a customer has already churned. Using it would be direct data leakage. It is used in the SQL analytics layer instead, where it belongs.
 
-**churn_score** — generated by an external churn model. Using it means the model learns from another model's output, not from genuine customer behavior.
+**churn_score**: generated by an external churn model. Using it means the model learns from another model's output, not from genuine customer behavior.
 
-**CLTV** — calculated using churn-related assumptions. Including it contaminates the feature space.
+**CLTV**: calculated using churn-related assumptions. Including it contaminates the feature space.
 
 These exclusions are deliberate, not oversights.
 
 ---
 
-## Analytics Layer — What the SQL found
+## Analytics Layer: What the SQL found
 
 Nine SQL files against a PostgreSQL database. Every finding is attached to a revenue number.
 
@@ -109,13 +115,13 @@ Nine SQL files against a PostgreSQL database. Every finding is attached to a rev
 
 **Month-to-month + Fiber optic + tenure under 10 months = 71% churn rate.** 238 active customers sit in this combination right now. Of those, 204 have no online security add-on and represent $16,266 in recoverable monthly revenue. One $10 per month add-on reduces their churn risk from 65% to 8%.
 
-**$73,704 every month was lost to internal failures** — bad support attitudes, network reliability issues, pricing gaps. That is 48% more than competitor-driven losses. The data says fix your own house before worrying about the competition.
+**$73,704 every month was lost to internal failures**, bad support attitudes, network reliability issues, pricing gaps. That is 48% more than competitor-driven losses. The data says fix your own house before worrying about the competition.
 
 At a conservative 20% retention success rate across five priority segments, the recoverable monthly revenue is **$49,302.**
 
 ### Why PostgreSQL and not SQLite
 
-PostgreSQL supports direct Power BI integration via live connection, handles concurrent access, and has stronger query optimization for analytical workloads. SQLite is a single-file embedded database — suitable for development, not for a BI tool connection or multi-user access.
+PostgreSQL supports direct Power BI integration via live connection, handles concurrent access, and has stronger query optimization for analytical workloads. SQLite is a single-file embedded database, suitable for development, not for a BI tool connection or multi-user access.
 
 ---
 
@@ -167,7 +173,7 @@ python -m src.run_pipeline
 streamlit run app/streamlit_app.py
 ```
 
-For the analytics layer — run the `.sql` files in order against a PostgreSQL database loaded with the Telco dataset. Open `churn_dashboard.pbix` in Power BI Desktop connected to the same database.
+For the analytics layer, run the `.sql` files in order against a PostgreSQL database loaded with the Telco dataset. Open `churn_dashboard.pbix` in Power BI Desktop connected to the same database.
 
 ---
 
