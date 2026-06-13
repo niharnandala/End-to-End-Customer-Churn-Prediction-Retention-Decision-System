@@ -47,7 +47,7 @@ Churn rate by internet service. Revenue lost by churn reason ordered by revenue 
 
 High risk active customers ranked by monthly revenue at risk. Month-to-month Fiber optic sits at the top with 333 customers and $29,445 at risk. Total row confirms 1,698 customers and $104,070 in monthly revenue that can still be protected. This is the page the retention team opens Monday morning.
 
-**The original Power BI dashboard file (`churn_dashboard.pbix`) is included under `analytics/powerbi/` for review.**
+**The Power BI dashboard file (`churn_dashboard.pbit`) is included under `analytics/power_bi/` for review.**
 
 ---
 
@@ -128,10 +128,13 @@ PostgreSQL supports direct Power BI integration via live connection, handles con
 ## Project Structure
 
 ```
-telco-churn-decision-system/
-├── app/                         # Streamlit UI
+End-to-End-Customer-Churn-Prediction-Retention-Decision-System/
+├── app/
+│   └── streamlit_app.py
 ├── src/
 │   ├── cleaning.py
+│   ├── config.py
+│   ├── data_loader.py
 │   ├── preprocessing.py
 │   ├── features.py
 │   ├── models.py
@@ -149,16 +152,36 @@ telco-churn-decision-system/
 │   │   ├── 07_intersection.sql
 │   │   ├── 08_churn_reason.sql
 │   │   └── 09_retention_roi.sql
-│   ├── powerbi/
-│   │   └── churn_dashboard.pbix
+│   ├── power_bi/
+│   │   └── churn_dashboard.pbit
 │   └── insights/
 │       ├── findings_summary.md
 │       └── retention_brief.md
-├── screenshots/
+├── notebook/
+│   ├── project_notebook.ipynb
+│   └── Telco_churn_project.ipynb
+├── artifacts/
+│   ├── feature_defaults.json
+│   └── feature_schema.json
 ├── models/
+│   ├── logistic_telco_model.pkl
+│   └── xgb_telco_model.pkl
 ├── reports/
+│   ├── feature_importance_logistic.csv
+│   ├── feature_importance_xgboost.csv
+│   ├── metrics.json
+│   ├── model_comparison.csv
+│   ├── retention_policy_table.csv
+│   ├── retention_scenarios.csv
+│   └── threshold_metrics.csv
 ├── data/
+│   ├── telco_churn.csv
+│   └── telco_churn.xlsx
 ├── data_processed/
+│   └── final_dataset.parquet
+├── screenshots/
+├── App_Videos/
+│   └── app-recording.webm
 ├── requirements.txt
 └── README.md
 ```
@@ -173,7 +196,7 @@ python -m src.run_pipeline
 streamlit run app/streamlit_app.py
 ```
 
-For the analytics layer, run the `.sql` files in order against a PostgreSQL database loaded with the Telco dataset. Open `churn_dashboard.pbix` in Power BI Desktop connected to the same database.
+For the analytics layer, run the `.sql` files in `analytics/sql/` in order against a PostgreSQL database loaded with the Telco dataset. Open `analytics/power_bi/churn_dashboard.pbit` in Power BI Desktop and connect to the same database.
 
 ---
 
