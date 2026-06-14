@@ -1,4 +1,4 @@
-# $49,302: A Telco Churn Analysis That Ends With a Number
+# $49,302 : A Telco Churn Analysis That Ends With a Number
 
 `SQL` · `PostgreSQL` · `Power BI` · `DAX` · `Python` · `Scikit-learn` · `Streamlit` · `SHAP`
 
@@ -45,7 +45,7 @@ Churn rate by internet service. Revenue lost by churn reason ordered by revenue 
   <img src="screenshots/powerbi_panel_3.png" width="85%" />
 </p>
 
-High risk active customers ranked by monthly revenue at risk. Month-to-month Fiber optic sits at the top with 333 customers and $29,445 at risk. Total row confirms 1,698 customers and $104,070 in monthly revenue that can still be protected. This is the page the retention team opens Monday morning.
+High risk active customers ranked by monthly revenue at risk. Month-to-month Fiber optic sits at the top with 333 customers and $29,445 at risk. Total row confirms 1,698 customers and $104,070 in monthly revenue that can still be protected. Sorted by monthly revenue at risk for operational prioritisation.
 
 **The Power BI dashboard file (`churn_dashboard.pbit`) is included under `analytics/power_bi/` for review.**
 
@@ -60,7 +60,7 @@ High risk active customers ranked by monthly revenue at risk. Month-to-month Fib
 - Explainability using SHAP to connect model output to business decisions
 - SQL analytics in PostgreSQL: window functions, CTEs, cohort analysis, revenue segmentation
 - Business dashboarding in Power BI with DAX measures and live PostgreSQL connection
-- Written business recommendations with actual revenue numbers attached
+- Written business recommendations with revenue numbers attached
 
 ---
 
@@ -103,7 +103,7 @@ These exclusions are deliberate, not oversights.
 
 ---
 
-## Analytics Layer: What the SQL found
+## Analytics Layer — What the SQL found
 
 Nine SQL files against a PostgreSQL database. Every finding is attached to a revenue number.
 
@@ -117,11 +117,21 @@ Nine SQL files against a PostgreSQL database. Every finding is attached to a rev
 
 **$73,704 every month was lost to internal failures**, bad support attitudes, network reliability issues, pricing gaps. That is 48% more than competitor-driven losses. The data says fix your own house before worrying about the competition.
 
-At a conservative 20% retention success rate across five priority segments, the recoverable monthly revenue is **$49,302.**
+At a conservative 20% retention success rate across five priority segments, the estimated recoverable monthly revenue is **~$49,302.**
 
 ### Why PostgreSQL and not SQLite
 
 PostgreSQL supports direct Power BI integration via live connection, handles concurrent access, and has stronger query optimization for analytical workloads. SQLite is a single-file embedded database, suitable for development, not for a BI tool connection or multi-user access.
+
+---
+
+## Limitations
+
+- No real-time scoring pipeline — predictions are batch, not live
+- No uplift modeling — the system identifies who to target but does not estimate causal retention impact
+- No data drift monitoring — model performance assumes the customer population remains stable over time
+- The 20% retention rate used in recovery estimates is an industry benchmark, not measured from this dataset
+- The Power BI dashboard requires a local PostgreSQL connection to run — it does not open as a standalone file without the database
 
 ---
 
@@ -152,7 +162,7 @@ End-to-End-Customer-Churn-Prediction-Retention-Decision-System/
 │   │   ├── 07_intersection.sql
 │   │   ├── 08_churn_reason.sql
 │   │   └── 09_retention_roi.sql
-│   ├── power_bi/
+│   ├── powerbi/
 │   │   └── churn_dashboard.pbit
 │   └── insights/
 │       ├── findings_summary.md

@@ -1,12 +1,15 @@
---Task 1--Explore shape of the table
+-- ================================================
+-- 02_cleaning.sql
+-- Purpose: Clean raw_customers table before analysis
+-- All issues identified during ML pipeline exploration
+-- (see notebooks/ for full EDA)
+-- ================================================
 
-SELECT 
-(SELECT count(*) from raw_customers) as row_count,
-(select count(*) from information_schema.columns
-where table_name='raw_customers') as column_count;
 
-select column_name from information_schema.columns
-where table_name='raw_customers'
+-- Step 1: Drop columns with no analytical value
+-- Geographic columns — all customers are in California
+-- No geographic variation exists to analyse
+-- Count column — redundant row counter
 
 BEGIN;
 
@@ -20,48 +23,59 @@ DROP COLUMN lat_long,
 DROP COLUMN count,
 DROP COLUMN city;
 
--- check if it looks right
-SELECT * FROM raw_customers LIMIT 5;
+COMMIT;
 
-commit;
-
-
-SELECT * FROM raw_customers LIMIT 5;
+-- Result: 25 columns remain from original 33
 
 
---check the information we get from information_schema
-select * from information_schema.columns where table_name='raw_customers' LIMIT 1;
+-- ================================================
 
---get column_names|date_type to verify data type mismatch
+-- Step 2: Fix blank total_charges values
+-- 11 customers have blank total_charges
+-- All have tenure_months = 0
+-- They just joined and have not completed one billing cycle
+-- Correct value is 0 — they have been charged nothing yet
 
-select column_name,data_type from information_schema.columns where table_name='raw_customers';
+BEGIN;
 
-select tenure_months,total_charges from raw_customers where total_charges !~ '^\d+(\.\d+)?$'
-
-SELECT tenure_months, monthly_charges, total_charges 
-FROM raw_customers 
+UPDATE raw_customers
+SET total_charges = '0'
 WHERE total_charges !~ '^\d+(\.\d+)?$';
 
---TENURE MONTHS are 0 thats why total_cahrges are blank,
-lets fill total_charge-blank to '0'--
+COMMIT;
 
-Begin;
-update raw_customers
-set total_charges='0'
-where total_charges !~ '^\d+(\.\d+)?$';
+-- Note: total_charges is stored as TEXT because blank spaces
+-- prevent PostgreSQL from loading it as NUMERIC directly
+-- We fix the blanks first then convert the column type below
 
 
-Commit;
+-- ================================================
 
-select count(total_charges) from raw_customers where total_charges !~ '^\d+(\.\d+)?$'
+-- Step 3: Convert total_charges from TEXT to NUMERIC
+-- Now that blanks are fixed all values are valid numbers
+-- Safe to convert
 
-Alter table raw_customers 
-Alter column total_charges type numeric
-using total_charges::Numeric
+ALTER TABLE raw_customers
+ALTER COLUMN total_charges TYPE NUMERIC
+USING total_charges::NUMERIC;
 
-select column_name,data_type from information_schema.columns where column_name='total_charges';
-select column_name,data_type from information_schema.columns where column_name='monthly_charges';
 
-select tenure_months,total_charges from raw_customers where tenure_months=1;
+-- ================================================
 
-SELECT COUNT(*) FROM raw_customers;
+-- Step 4: Final row count check
+-- Confirms no rows were accidentally deleted during cleaning
+
+SELECT COUNT(*) AS total_rows FROM raw_customers;
+
+-- Expected: 7043
+
+
+-- ================================================
+
+-- Data quality notes
+-- churn_reason is NULL for non-churned customers
+-- This is expected — NULL means did not churn, not missing data
+-- No duplicate rows exist in this dataset
+-- No unexpected nulls found in any other column
+-- Monthly charges and tenure months have no impossible values
+-- Outliers in numerical columns are real customer data not errors
